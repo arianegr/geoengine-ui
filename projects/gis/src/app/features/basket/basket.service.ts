@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {AppConfig} from '../app-config.service';
+import {AppConfig} from '../../app-config.service';
 import {
     BackendService,
     Config,

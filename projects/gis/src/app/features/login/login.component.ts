@@ -6,7 +6,7 @@ import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import {Config, NotificationService, UserService, User, geoengineValidators} from '@geoengine/core';
 import {first} from 'rxjs/operators';
 import {Router} from '@angular/router';
-import {AppConfig} from '../app-config.service';
+import {AppConfig} from '../../app-config.service';
 
 enum FormStatus {
     LoggedOut,

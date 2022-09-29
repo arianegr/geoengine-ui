@@ -1,4 +1,4 @@
-import {BehaviorSubject, concat, first, ignoreElements, Observable} from 'rxjs';
+import {Observable, BehaviorSubject} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
 import {
@@ -14,47 +14,41 @@ import {
     ViewContainerRef,
 } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {MatIconRegistry} from '@angular/material/icon';
 import {MatDrawerToggleResult, MatSidenav} from '@angular/material/sidenav';
 import {MatTabGroup} from '@angular/material/tabs';
 import {
-    AddDataButton,
     AddDataComponent,
-    Config,
+    AddDataButton,
     Layer,
-    LayoutService,
-    MapContainerComponent,
-    MapService,
-    NavigationButton,
-    NotificationService,
-    OidcComponent,
-    OperatorListButtonGroups,
-    OperatorListComponent,
-    PlotListComponent,
-    ProjectService,
-    RandomColorService,
-    SidenavConfig,
     SidenavContainerComponent,
-    SpatialReferenceService,
-    TimeConfigComponent,
+    LayoutService,
     UserService,
+    RandomColorService,
+    NotificationService,
+    Config,
+    ProjectService,
+    NavigationButton,
+    NavigationComponent,
+    MapService,
+    MapContainerComponent,
     WorkspaceSettingsComponent,
+    OperatorListComponent,
+    OperatorListButtonGroups,
+    TimeConfigComponent,
+    PlotListComponent,
+    SidenavConfig,
+    SpatialReferenceService,
 } from '@geoengine/core';
-import {DomSanitizer} from '@angular/platform-browser';
-import {ActivatedRoute, ParamMap} from '@angular/router';
-import {AppConfig} from './app-config.service';
-import {HelpComponent} from './help/help.component';
-import {SplashDialogComponent} from './splash-dialog/splash-dialog.component';
-import {BasketService} from './basket/basket.service';
-import {BasketDialogComponent} from './basket/basket-dialog/basket-dialog.component';
+import {ActivatedRoute} from '@angular/router';
+import {AppConfig} from '../../app-config.service';
 
 @Component({
-    selector: 'geoengine-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
+    selector: 'geoengine-main',
+    templateUrl: './gis-main.component.html',
+    styleUrls: ['./gis-main.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit, AfterViewInit {
+export class GisMainComponent implements OnInit, AfterViewInit {
     @ViewChild(MapContainerComponent, {static: true}) mapComponent!: MapContainerComponent;
     @ViewChild(MatTabGroup, {static: true}) bottomTabs!: MatTabGroup;
 
@@ -67,8 +61,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     readonly layerListVisible$: Observable<boolean>;
     readonly layerDetailViewVisible$: Observable<boolean>;
 
-    readonly navigationButtons = AppComponent.setupNavigation();
-    readonly addAFirstLayerConfig = AppComponent.setupAddDataConfig();
+    readonly navigationButtons = this.setupNavigation();
+    readonly addAFirstLayerConfig = GisMainComponent.setupAddDataConfig();
 
     middleContainerHeight$: Observable<number>;
     bottomContainerHeight$: Observable<number>;
@@ -80,21 +74,16 @@ export class AppComponent implements OnInit, AfterViewInit {
         @Inject(Config) readonly config: AppConfig,
         readonly layoutService: LayoutService,
         readonly projectService: ProjectService,
-        readonly vcRef: ViewContainerRef, // reference used by color picker
+        readonly vcRef: ViewContainerRef, // reference used by color picker, MUST BE EXACTLY THIS NAME
         readonly userService: UserService,
         private readonly changeDetectorRef: ChangeDetectorRef,
         private readonly dialog: MatDialog,
-        private readonly iconRegistry: MatIconRegistry,
         private readonly randomColorService: RandomColorService,
         private readonly activatedRoute: ActivatedRoute,
         private readonly notificationService: NotificationService,
         private readonly mapService: MapService,
         private readonly spatialReferenceService: SpatialReferenceService,
-        private readonly basketService: BasketService,
-        private readonly sanitizer: DomSanitizer,
     ) {
-        this.registerIcons();
-
         vcRef.length; // eslint-disable-line @typescript-eslint/no-unused-expressions
 
         this.layersReverse$ = this.projectService.getLayerStream().pipe(map((layers) => layers.slice(0).reverse()));
@@ -134,11 +123,18 @@ export class AppComponent implements OnInit, AfterViewInit {
             .getNewPlotStream()
             .subscribe(() => this.layoutService.setSidenavContentComponent({component: PlotListComponent}));
 
-        setTimeout(() => {
-            // emit window height once to resize components if necessary
-            this.windowHeight();
-        });
-        this.handleQueryParameters();
+        // emit window height once to resize components if necessary
+        this.windowHeight();
+
+        // set the stored tab index
+        // this.layoutService.getLayerDetailViewTabIndexStream().subscribe(tabIndex => {
+        //     if (this.bottomTabs.selectedIndex !== tabIndex) {
+        //         this.bottomTabs.selectedIndex = tabIndex;
+        //         setTimeout(() => this.changeDetectorRef.markForCheck());
+        //     }
+        // });
+
+        // this.handleQueryParameters();
     }
 
     setTabIndex(index: number): void {
@@ -150,27 +146,16 @@ export class AppComponent implements OnInit, AfterViewInit {
         return layer.id;
     }
 
-    private registerIcons(): void {
-        this.iconRegistry.addSvgIconInNamespace('vat', 'logo', this.sanitizer.bypassSecurityTrustResourceUrl('assets/vat_logo.svg'));
-
-        // used for navigation
-        this.iconRegistry.addSvgIcon('cogs', this.sanitizer.bypassSecurityTrustResourceUrl('assets/icons/cogs.svg'));
-    }
-
-    private static setupNavigation(): Array<NavigationButton> {
+    private setupNavigation(): Array<NavigationButton> {
         return [
+            NavigationComponent.createLoginButton(this.userService, this.layoutService, this.config),
             {
-                sidenavConfig: {component: OidcComponent},
-                icon: 'account_circle',
-                tooltip: 'Login',
-            },
-            {
-                sidenavConfig: AppComponent.setupAddDataConfig(),
+                sidenavConfig: GisMainComponent.setupAddDataConfig(),
                 icon: 'add',
                 tooltip: 'Add Data',
             },
             {
-                sidenavConfig: {component: OperatorListComponent, config: {operators: AppComponent.createOperatorListButtons()}},
+                sidenavConfig: {component: OperatorListComponent, config: {operators: GisMainComponent.createOperatorListButtons()}},
                 icon: '',
                 svgIcon: 'cogs',
                 tooltip: 'Operators',
@@ -190,21 +175,22 @@ export class AppComponent implements OnInit, AfterViewInit {
                 icon: 'settings',
                 tooltip: 'Workspace',
             },
-            {
-                sidenavConfig: {component: HelpComponent},
-                icon: 'help',
-                tooltip: 'Help',
-            },
+            // {
+            //     sidenavConfig: {component: HelpComponent},
+            //     icon: 'help',
+            //     tooltip: 'Help',
+            // },
         ];
     }
 
     private static setupAddDataConfig(): SidenavConfig {
-        return {component: AddDataComponent, config: {buttons: AppComponent.createAddDataListButtons()}};
+        return {component: AddDataComponent, config: {buttons: GisMainComponent.createAddDataListButtons()}};
     }
 
     private static createAddDataListButtons(): Array<AddDataButton> {
         return [
             AddDataComponent.createDatasetListButton(),
+            AddDataComponent.createLayerCollectionButton(),
             AddDataComponent.createUploadButton(),
             AddDataComponent.createDrawFeaturesButton(),
             AddDataComponent.createAddWorkflowByIdButton(),
@@ -234,37 +220,39 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.windowHeight$.next(window.innerHeight);
     }
 
-    /**
-     * @private
-     * @return true, if the splash dialog should be skipped, false otherwise
-     */
-    private handleQueryParameters(): void {
-        const params = new URLSearchParams(window.location.search);
-        const sessionState = params.get('session_state');
-        const code = params.get('code');
-        const state = params.get('state');
-
-        let login;
-        if (sessionState && code && state) {
-            login = this.userService.oidcLogin({sessionState, code, state}).pipe(first());
-        }
-
-        const handleBasketSubscription: (p: ParamMap) => void = (p: ParamMap) => {
-            const basketId = p.get('basket_id');
-            if (basketId != null) {
-                this.basketService.handleBasket(basketId).subscribe((result) => {
-                    this.dialog.open(BasketDialogComponent, {data: {result}});
-                });
-            } else {
-                const showSplash = this.userService.getSettingFromLocalStorage(SplashDialogComponent.SPLASH_DIALOG_NAME);
-                if (showSplash === null || JSON.parse(showSplash)) {
-                    this.dialog.open(SplashDialogComponent, {});
-                }
-            }
-        };
-        const routeParams = this.activatedRoute.queryParamMap;
-
-        if (login) concat(login.pipe(ignoreElements()), routeParams).subscribe(handleBasketSubscription);
-        else routeParams.subscribe(handleBasketSubscription);
-    }
+    // private handleQueryParameters() {
+    //     this.activatedRoute.queryParams.subscribe(p => {
+    //         for (const parameter of Object.keys(p)) {
+    //             const value = p[parameter];
+    //             switch (parameter) {
+    //                 case 'workflow':
+    //                     try {
+    //                         const newLayer = Layer.fromDict(JSON.parse(value));
+    //                         this.projectService.getProjectStream().pipe(first()).subscribe(project => {
+    //                             if (project.layers.length > 0) {
+    //                                 // show popup
+    //                                 this.dialog.open(WorkflowParameterChoiceDialogComponent, {
+    //                                     data: {
+    //                                         dialogTitle: 'Workflow URL Parameter',
+    //                                         sourceName: 'URL parameter',
+    //                                         layers: [newLayer],
+    //                                         nonAvailableNames: [],
+    //                                         numberOfLayersInProject: project.layers.length,
+    //                                     }
+    //                                 });
+    //                             } else {
+    //                                 // just add the layer if the layer array is empty
+    //                                 this.projectService.addLayer(newLayer);
+    //                             }
+    //                         });
+    //                     } catch (error) {
+    //                         this.notificationService.error(`Invalid Workflow: »${error}«`);
+    //                     }
+    //                     break;
+    //                 default:
+    //                     this.notificationService.error(`Unknown URL Parameter »${parameter}«`);
+    //             }
+    //         }
+    //     });
+    // }
 }

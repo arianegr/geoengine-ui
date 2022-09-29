@@ -1,0 +1,170 @@
+@use '@angular/material' as mat;
+
+// Material Base Styles
+@include mat.core();
+
+// Define Colors
+$geoengine-dark-green: (
+    50: #e7f1e8,
+    100: #c3ddc5,
+    200: #9cc79e,
+    300: #74b077,
+    400: #569f59,
+    500: #388e3c,
+    600: #328636,
+    700: #2b7b2e,
+    800: #247127,
+    900: #175f1a,
+    A100: #9aff9d,
+    A200: #67ff6b,
+    A400: #34ff3a,
+    A700: #1aff21,
+    contrast: (
+        50: #000000,
+        100: #000000,
+        200: #000000,
+        300: #000000,
+        400: #000000,
+        500: #ffffff,
+        600: #ffffff,
+        700: #ffffff,
+        800: #ffffff,
+        900: #ffffff,
+        A100: #000000,
+        A200: #000000,
+        A400: #000000,
+        A700: #000000,
+    ),
+);
+
+$geoengine-light-green: (
+    50: #edf7ed,
+    100: #d2ecd2,
+    200: #b5dfb4,
+    300: #97d296,
+    400: #80c980,
+    500: #6abf69,
+    600: #62b961,
+    700: #57b156,
+    800: #4da94c,
+    900: #3c9b3b,
+    A100: #ebffeb,
+    A200: #b8ffb8,
+    A400: #86ff85,
+    A700: #6dff6b,
+    contrast: (
+        50: #000000,
+        100: #000000,
+        200: #000000,
+        300: #000000,
+        400: #000000,
+        500: #000000,
+        600: #000000,
+        700: #000000,
+        800: #000000,
+        900: #ffffff,
+        A100: #000000,
+        A200: #000000,
+        A400: #000000,
+        A700: #000000,
+    ),
+);
+
+// Define App Theme
+$geoengine-primary: mat.define-palette($geoengine-dark-green);
+$geoengine-accent: mat.define-palette($geoengine-light-green, A200, A100, A400);
+$geoengine-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$geoengine-theme: mat.define-light-theme($geoengine-primary, $geoengine-accent, $geoengine-warn);
+
+// Apply Angular Material Mixin to Color Theme
+@include mat.all-component-themes($geoengine-theme);
+
+:root {
+    --geoengine-primary-color: #{mat.get-color-from-palette($geoengine-primary)};
+    --geoengine-accent-color: #{mat.get-color-from-palette($geoengine-accent)};
+    --geoengine-warn-color: #{mat.get-color-from-palette($geoengine-warn)};
+
+    --geoengine-faded-accent-color: #{mat.get-color-from-palette($geoengine-accent, 0.32)};
+
+    --geoengine-foreground-text-color: #{mat.get-color-from-palette(map-get($geoengine-theme, foreground), text)};
+    --geoengine-foreground-secondary-text-color: #{mat.get-color-from-palette(map-get($geoengine-theme, foreground), secondary-text)};
+
+    --geoengine-background-color: #{map-get(map-get($geoengine-theme, background), background)};
+    --geoengine-background-hover-color: #{mat.get-color-from-palette(map-get($geoengine-theme, background), hover)};
+    --geoengine-card-background-color: #{map-get(map-get($geoengine-theme, background), card)};
+
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+}
+
+a {
+    color: mat.get-color-from-palette(map-get($geoengine-theme, foreground), secondary-text);
+}
+
+index {
+    body {
+        margin: 0;
+        padding: 0;
+        color: whitesmoke;
+        text-shadow: 0 1px 3px rgba(245, 245, 245, 0.12), 0 1px 2px rgba(245, 245, 245, 0.24);
+        background: #303030;
+        overflow: hidden;
+    }
+    @media (prefers-color-scheme: light) {
+        body {
+            background: #ccc;
+        }
+    }
+    img.center-image {
+        --center-image-width: 20vw;
+        position: absolute;
+        width: var(--center-image-width);
+        height: var(--center-image-width);
+        left: calc(50% - var(--center-image-width) / 2);
+        top: calc(50% - var(--center-image-width) / 2);
+        opacity: 0.87;
+    }
+    .loader {
+        --loader-width: 30vw;
+        width: var(--loader-width);
+        height: var(--loader-width);
+        border-radius: 50%;
+        display: inline-block;
+        border-top: 4px solid rgba(245, 245, 245, 1);
+        border-right: 4px solid transparent;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+
+        position: absolute;
+        left: calc(50% - var(--loader-width) / 2);
+        top: calc(50% - var(--loader-width) / 2);
+    }
+    .loader::after {
+        content: '';
+        box-sizing: border-box;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--loader-width);
+        height: var(--loader-width);
+        border-radius: 50%;
+        border-left: 4px solid rgba(245, 245, 245, 0.12);
+        border-bottom: 4px solid transparent;
+        animation: rotation 0.5s linear infinite reverse;
+    }
+    @media (prefers-color-scheme: light) {
+        .loader::after {
+            border-left-color: rgba(245, 245, 245, 0.5);
+        }
+    }
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+}

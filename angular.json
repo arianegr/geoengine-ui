@@ -100,6 +100,7 @@
                         ],
                         "styles": [
                             "projects/gis/src/styles.scss",
+                            "projects/gis/src/styles-gis.scss",
                             "dist/core/assets/fonts/roboto/roboto.css",
                             "dist/core/assets/fonts/pacifico/pacifico.css",
                             "dist/core/assets/fonts/material-design-icons/material-icons.css",
@@ -663,8 +664,8 @@
                     "prefix": "geoengine"
                 }
             },
-            "root": "projects/dashboards/gfbio",
-            "sourceRoot": "projects/dashboards/gfbio/src",
+            "root": "projects/gis",
+            "sourceRoot": "projects/gis/src",
             "prefix": "geoengine",
             "architect": {
                 "build": {
@@ -682,14 +683,14 @@
                             "fast-deep-equal",
                             "fast-json-stable-stringify"
                         ],
-                        "outputPath": "dist/dashboards/gfbio",
-                        "index": "projects/dashboards/gfbio/src/index.html",
-                        "main": "projects/dashboards/gfbio/src/main.ts",
-                        "polyfills": "projects/dashboards/gfbio/src/polyfills.ts",
-                        "tsConfig": "projects/dashboards/gfbio/tsconfig.app.json",
+                        "outputPath": "dist/gfbio",
+                        "index": "projects/gis/src/index.html",
+                        "main": "projects/gis/src/main.ts",
+                        "polyfills": "projects/gis/src/polyfills.ts",
+                        "tsConfig": "projects/gis/tsconfig.app.json",
                         "assets": [
-                            "projects/dashboards/gfbio/src/favicon.ico",
-                            "projects/dashboards/gfbio/src/assets",
+                            "projects/gis/src/favicon-gfbio.ico",
+                            "projects/gis/src/assets",
                             {
                                 "glob": "**/*",
                                 "input": "dist/core/assets",
@@ -697,7 +698,8 @@
                             }
                         ],
                         "styles": [
-                            "projects/dashboards/gfbio/src/styles.scss",
+                            "projects/gis/src/styles.scss",
+                            "projects/gis/src/styles-gfbio.scss",
                             "dist/core/assets/fonts/roboto/roboto.css",
                             "dist/core/assets/fonts/pacifico/pacifico.css",
                             "dist/core/assets/fonts/material-design-icons/material-icons.css",
@@ -716,8 +718,8 @@
                         "production": {
                             "fileReplacements": [
                                 {
-                                    "replace": "projects/dashboards/gfbio/src/environments/environment.ts",
-                                    "with": "projects/dashboards/gfbio/src/environments/environment.prod.ts"
+                                    "replace": "projects/gis/src/environments/environment.ts",
+                                    "with": "projects/gis/src/environments/environment.gfbio.prod.ts"
                                 }
                             ],
                             "optimization": true,
@@ -740,7 +742,14 @@
                                 }
                             ]
                         },
-                        "development": {}
+                        "development": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "projects/gis/src/environments/environment.ts",
+                                    "with": "projects/gis/src/environments/environment.gfbio.ts"
+                                }
+                            ]
+                        }
                     },
                     "defaultConfiguration": "production"
                 },
@@ -766,25 +775,25 @@
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
-                        "main": "projects/dashboards/gfbio/src/test.ts",
-                        "polyfills": "projects/dashboards/gfbio/src/polyfills.ts",
-                        "tsConfig": "projects/dashboards/gfbio/tsconfig.spec.json",
-                        "karmaConfig": "projects/dashboards/gfbio/karma.conf.js",
-                        "assets": ["projects/dashboards/gfbio/src/favicon.ico", "projects/dashboards/gfbio/src/assets"],
-                        "styles": ["projects/dashboards/gfbio/src/styles.scss"],
+                        "main": "projects/gis/src/test.ts",
+                        "polyfills": "projects/gis/src/polyfills.ts",
+                        "tsConfig": "projects/gis/tsconfig.spec.json",
+                        "karmaConfig": "projects/gis/karma.conf.js",
+                        "assets": ["projects/gis/src/favicon-gfbio.ico", "projects/gis/src/assets"],
+                        "styles": ["projects/gis/src/styles.scss", "projects/gis/src/styles-gfbio.scss"],
                         "scripts": []
                     }
                 },
                 "lint": {
                     "builder": "@angular-eslint/builder:lint",
                     "options": {
-                        "lintFilePatterns": ["projects/dashboards/gfbio/**/*.ts", "projects/dashboards/gfbio/**/*.html"]
+                        "lintFilePatterns": ["projects/gis/**/*.ts", "projects/gis/**/*.html"]
                     }
                 },
                 "e2e": {
                     "builder": "@angular-devkit/build-angular:protractor",
                     "options": {
-                        "protractorConfig": "projects/dashboards/gfbio/e2e/protractor.conf.js"
+                        "protractorConfig": "projects/gis/e2e/protractor.conf.js"
                     },
                     "configurations": {
                         "production": {
